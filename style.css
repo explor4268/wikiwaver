@@ -1,0 +1,216 @@
+:root{
+    --main-font: -apple-system, BlinkMacSystemFont, 'Avenir Next', avenir, 'Noto Sans', 'Segoe UI', 'Helvetica Neue', 'Adwaita Sans', Cantarell, Ubuntu, Roboto, helvetica, arial, sans-serif;
+    --visualizer-circle-initial-size-increase: 20px;
+    --visualizer-circle-animation-timeout: 20s;
+}
+
+:root{
+    color-scheme: light;
+    --main-bg: #fff;
+    --main-color: #000;
+    --hyperlink-color: #00f;
+    --hyperlink-visited-color: #8000ff;
+    --log-info-bg: #aaa;
+    --log-info-color: #000;
+    --log-entry-bg: #fff;
+    --log-entry-color: #000;
+    --log-error-bg: #f66;
+    --log-error-color: #000;
+    --diflength-positive: #008000;
+    --diflength-negative: #f00;
+    --usertype-bot: #555;
+    --usertype-anonymous: #22a;
+    --edittype-undo: #ff8000;
+    --edittype-move: #8000ff;
+    --visualizer-bg: #204060;
+    --visualizer-circle-bg: #505050;
+    --visualizer-circle-tooltip-color: #fff;
+    --visualizer-circle-bg-usertype-bot: #400088;
+    --visualizer-circle-bg-usertype-anonymous: #800;
+}
+
+@media(prefers-color-scheme: dark){
+    :root{
+        color-scheme: dark;
+        --main-bg: #000;
+        --main-color: #fff;
+        --hyperlink-color: #0ff;
+        --hyperlink-visited-color: #0080ff;
+        --log-info-bg: #555;
+        --log-info-color: #fff;
+        --log-entry-bg: #000;
+        --log-entry-color: #fff;
+        --log-error-bg: #f33;
+        --log-error-color: #fff;
+        --diflength-positive: #0f0;
+        --diflength-negative: #ff4000;
+        --usertype-bot: #aaa;
+        --usertype-anonymous: #aaf;
+        --edittype-undo: #ff0;
+        --edittype-move: #0080ff;
+        --visualizer-bg: #204060;
+        --visualizer-circle-bg: #505050;
+        --visualizer-circle-tooltip-color: #fff;
+        --visualizer-circle-bg-usertype-bot: #400088;
+        --visualizer-circle-bg-usertype-anonymous: #800;
+    }
+}
+
+.hidden{
+    display: none;
+}
+
+html,body{
+    font-family: var(--main-font);
+    background-color: var(--main-bg);
+    color: var(--main-color);
+}
+
+#logs{
+    display: flex;
+    flex-direction: column;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+#visualizer-fullscreen-button{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    opacity: 0.5;
+    z-index: 999;
+}
+
+#visualizer-fullscreen-button:hover{
+    opacity: 1;
+}
+
+#visualizer-container{
+    width: 100%;
+    height: 100vh;
+    background-color: var(--visualizer-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes visualizer-circle-animation{
+    from{
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    to{
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+@keyframes visualizer-circle-tooltip-animation{
+    from{
+        opacity: 1;
+    }
+    to{
+        opacity: 0;
+    }
+}
+
+.visualizer-circle-container{
+    text-decoration: none;
+    position: absolute;
+    white-space: nowrap;
+}
+
+.visualizer-circle-tooltip{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--visualizer-circle-tooltip-color);
+    animation: var(--visualizer-circle-animation-timeout) ease-out 0s 1 normal forwards running visualizer-circle-tooltip-animation;
+}
+
+.visualizer-circle{
+    position: absolute;
+    border-radius: 50%;
+    background-color: var(--visualizer-circle-bg);
+    animation: var(--visualizer-circle-animation-timeout) linear 0s 1 normal forwards running visualizer-circle-animation;
+}
+
+body:has(>details>fieldset>div>input#log-sort-newattop:checked)>details>#logs{
+    flex-direction: column-reverse;
+}
+
+a{
+    color: var(--hyperlink-color);
+}
+
+a:visited{
+    color: var(--hyperlink-visited-color);
+}
+
+.log{
+    font-size: 0.75rem;
+}
+
+.log-info{
+    background-color: var(--log-info-bg);
+    color: var(--log-info-color);
+}
+
+.log-entry{
+    background-color: var(--log-entry-bg);
+    color: var(--log-entry-color);
+}
+
+.log-error{
+    background-color: var(--log-error-bg);
+    color: var(--log-error-color);
+}
+
+.difflength-positive{
+    color: var(--diflength-positive)
+}
+
+.difflength-negative{
+    color: var(--diflength-negative)
+}
+
+.usertype-bot{
+    color: var(--usertype-bot);
+}
+
+.usertype-anonymous{
+    color: var(--usertype-anonymous);
+}
+
+.edittype-undo{
+    color: var(--edittype-undo);
+}
+
+.edittype-move{
+    color: var(--edittype-move);
+}
+
+details>summary{
+    cursor: default;
+}
+
+@supports selector(:open){
+    details>summary{
+        >.detail-status-hide,
+        >.detail-status-or{
+            display: none;
+        }
+    }
+    details:open>summary>.detail-status-hide{
+        display: revert;
+    }
+    details:open>summary>.detail-status-show{
+        display: none;
+    }
+}
+
+.rangeinput{
+    display: flex;
+    align-items: center;
+}

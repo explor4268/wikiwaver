@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wikiwaver</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // biome-ignore lint/correctness/noUnusedVariables: cross-file reference, intentional
+        var scriptSuccessfullyLoaded=false;
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js" integrity="sha512-+Ru50BzEpZjlFzVnjSmJfYFPFfY2hS0Kjlu/IvqaJoux7maF5lJrRVUJWJ2LevPls7rd242GLbWEt+zAo4OVVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body onload="if(!scriptSuccessfullyLoaded){document.getElementById('script-error').className=''}">
+    <h1>wikiwaver</h1>
+    <noscript>
+        <p class="log-error">
+            Sorry, this web app requires JavaScript to function. Please enable JavaScript to continue.
+        </p>
+    </noscript>
+    <div id="script-error" class="hidden">
+        <p class="log-error">
+            Please update your web browser to continue using this web app. If your browser is already updated, please send a bug report on CHANGETHIS.
+        </p>
+    </div>
+    <dialog id="mobile-warning">
+        <h1>Notice for Mobile Users</h1>
+        <p>Beware that because of the EventStreams approach and the <a href="https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams_HTTP_Service#Filtering" target="_blank">lack of event filtering</a>, this web app uses a significant amount of network bandwidth (about 60-100 KiB/s or about 500-800 kbit/s).</p>
+        <p>Running this web app in the foreground or background for an hour could consume roughly <b>up to 350 megabytes of data, or even more.</b> So, ensure that you have a sufficient internet connection before running this web app in the background.</p>
+        <p id="bgplayback-mobilesafari-notice" class="hidden"><b>Also, please be aware that background audio playback is not supported on iOS browsers (including Safari, Chrome, and Firefox on iOS) at the moment. If you accidentally did this by mistake, you can tap anywhere in this page to resume audio playback.</b></p>
+        <form method="dialog">
+            <div>
+                <input type="checkbox" id="mobile-warning-hide-forever" autocomplete="off">
+                <label for="mobile-warning-hide-forever">Don't show this message again</label>
+            </div>
+            <i>Your preferences will be saved in your browser's local storage.</i>
+            <div><button style="padding: 10px;">Close</button></div>
+        </form>
+    </dialog>
+    <button id="start-stop-button" disabled>Loading page...</button>
+    <details open>
+        <summary>Options (click to <span class="detail-status-show">show</span><span class="detail-status-or">/</span><span class="detail-status-hide">hide</span>)</summary>
+        <fieldset>
+            <legend>Theme</legend>
+            <div id="theme-selector-container">
+                <input type="radio" name="theme-selector" id="theme-selector-auto" autocomplete="off" checked><label for="theme-selector-auto">System default</label>
+                <input type="radio" name="theme-selector" id="theme-selector-light" autocomplete="off"><label for="theme-selector-light">Light</label>
+                <input type="radio" name="theme-selector" id="theme-selector-dark" autocomplete="off"><label for="theme-selector-dark">Dark</label>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Playback mode</legend>
+            <div>
+                <input type="checkbox" id="playbackmode-webaudiosynth" autocomplete="off">
+                <label for="playbackmode-webaudiosynth">Web Audio API Synth</label>
+                <details open>
+                    <summary>Web Audio API Synth Settings</summary>
+                    <div class="rangeinput">
+                        <label for="webaudiosynth-volume">Volume:</label>
+                        <input type="range" id="webaudiosynth-volume" min="0" max="100" step="1" value="50" autocomplete="off">
+                        <label for="webaudiosynth-volume"><span id="webaudiosynth-volume-label">50</span>%</label>
+                    </div>
+                </details>
+            </div>
+            <div>
+                <input type="checkbox" id="playbackmode-midi" autocomplete="off">
+                <label for="playbackmode-midi">MIDI</label>
+                <details id="midi-device-selector-container">
+                    <summary>MIDI Settings</summary>
+                    <label for="midi-device-selector">MIDI Device: </label>
+                    <select id="midi-device-selector" autocomplete="off">
+                        <option value="none" selected>None</option>
+                    </select>
+                </details>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Listener options</legend>
+            <span>Wikimedia Foundation Wikis Listener</span>
+            <div><input type="checkbox" id="wikis-selector-showcomments" autocomplete="off"><label for="wikis-selector-showcomments">Show comments</label></div>
+            <details id="wikis-selector-details">
+                <summary>Wikis:</summary>
+                <input type="text" id="wikis-selector-filter" placeholder="Filter...">
+                <input type="checkbox" id="wikis-selector-selectall" autocomplete="off"><label for="wikis-selector-selectall">Select/deselect all</label>
+                <div id="wikis-selector-container">
+                    <div id="wikis-selector-is-loading">Loading...</div>
+                </div>
+            </details>
+        </fieldset>
+        <fieldset>
+            <legend>Logger options</legend>
+            <div id="logger-item-placement-option-container">
+                <span>Place new items at: </span>
+                <input type="radio" class="log-sort-dir-option" name="log-sort-dir" id="log-sort-newattop" autocomplete="off"><label for="log-sort-newattop">Top</label>
+                <input type="radio" class="log-sort-dir-option" name="log-sort-dir" id="log-sort-newatbottom" checked autocomplete="off"><label for="log-sort-newatbottom">Bottom</label>
+            </div>
+            <div class="rangeinput">
+                <label for="log-max-items">Max log items:</label>
+                <input type="range" id="log-max-items" min="5" max="100" step="1" value="20" autocomplete="off">
+                <label for="log-max-items"><span id="log-max-items-label">20</span> entries</label>
+            </div>
+        </fieldset>
+    </details>
+    <details id="visualizer-details">
+        <summary>Visualizer (click to <span class="detail-status-show">show</span><span class="detail-status-or">/</span><span class="detail-status-hide">hide</span>)</summary>
+        <div id="visualizer-container" tabindex="-1">
+            <button id="visualizer-fullscreen-button">Fullscreen</button>
+        </div>
+    </details>
+    <details open>
+        <summary>Logs (click to <span class="detail-status-show">show</span><span class="detail-status-or">/</span><span class="detail-status-hide">hide</span>)</summary>
+        <div id="logs"></div>
+    </details>
+    <div>You have listened to a total of <span id="total-entries">0</span> edits</div>
+    <script src="preferences.js"></script>
+    <script src="logger.js"></script>
+    <script src="listener/WikimediaListener.js"></script>
+    <script src="playback/webaudio-synth.js"></script>
+    <script src="playback/midi.js"></script>
+    <script src="playback/visualizer.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
