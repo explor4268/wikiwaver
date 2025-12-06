@@ -19,6 +19,6 @@ trap -- 'echo; echo Interrupt signal received' INT
     curl -sL 'https://gitlab.wikimedia.org/repos/movement-insights/canonical-data/-/raw/main/wiki/wikis.tsv' |
     grep -F '	wikipedia	' |
     grep -F '	open	public	public	' |
-    sed -E 's#^(.*)	(.*)	.*	(.*)	.*	.*	.*	.*	.*	.*	(.*)$#{"w":"\1","d":"\2","l":"\3","n":"\4"},#' &&
+    sed -E 's#^(.*)	.*	.*	(.*)	.*	.*	.*	.*	.*	.*	(.*)$#{"w":"\1","l":"\2","n":"\3"},#' &&
     echo ']') | sed -z 's#},\n]#}\n]#' > "$tmpoutfile"
 mv "$tmpoutfile" "$outfile"
