@@ -32,8 +32,6 @@ This project was originally started as a clone of <https://github.com/hatnote/li
   - [ ] url params
     - [ ] disable seedrandom
     - [ ] disable localstorage
-- [ ] push to gh-pages
-    - [ ] versioning (vMAJOR_CHANGE.MINOR_CHANGE.PATCH)
 
 ## Credits
 
