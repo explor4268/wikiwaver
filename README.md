@@ -1,6 +1,6 @@
 # wikiwaver
 
-Listen to Wikipedia's Recent Changes feed using the [official EventStreams HTTP Service provided Wikimedia Foundation](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams_HTTP_Service).
+Listen to Wikipedia's Recent Changes feed using the [official EventStreams HTTP Service provided by Wikimedia Foundation](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams_HTTP_Service).
 
 This project was originally started as a clone of <https://github.com/hatnote/listen-to-wikipedia>, which uses WebSockets instead of EventStreams and has no HTTPS yet.
 
@@ -32,13 +32,6 @@ This project was originally started as a clone of <https://github.com/hatnote/li
   - [ ] url params
     - [ ] disable seedrandom
     - [ ] disable localstorage
-- [ ] add outdated browser warning
-    - [x] banner
-    - [ ] link to issues
-- [ ] add about page
-- [ ] add links
-    - [ ] github link
-    - [ ] issues link
 - [ ] push to gh-pages
     - [ ] versioning (vMAJOR_CHANGE.MINOR_CHANGE.PATCH)
 
