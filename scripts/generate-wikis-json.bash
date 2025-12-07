@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-outdir="listener"
+outdir="public/listener"
 
 if [[ ! -d "$outdir" ]]; then
     echo 'Please run this script inside the project'"'"'s root directory that contains the "'"$outdir"'" directory.'
