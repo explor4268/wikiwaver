@@ -1,5 +1,7 @@
 # wikiwaver
 
+[GitHub](https://github.com/explor4268/wikiwaver) | [Codeberg mirror](https://codeberg.org/exploraz/wikiwaver)
+
 Listen to Wikipedia's Recent Changes feed using the [official EventStreams HTTP Service provided by Wikimedia Foundation](https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams_HTTP_Service).
 
 This project was originally started as a clone of <https://github.com/hatnote/listen-to-wikipedia>, which uses WebSockets instead of EventStreams and has no HTTPS support yet.
