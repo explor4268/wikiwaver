@@ -22,3 +22,5 @@ trap -- 'echo; echo Interrupt signal received' INT
     sed -E 's#^(.*)	.*	.*	(.*)	.*	.*	.*	.*	.*	.*	(.*)$#{"w":"\1","l":"\2","n":"\3"},#' &&
     echo ']') | sed -z 's#},\n]#}\n]#' > "$tmpoutfile"
 mv "$tmpoutfile" "$outfile"
+
+# vim: set noexpandtab ts=8 sw=4:
