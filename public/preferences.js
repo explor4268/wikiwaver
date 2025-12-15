@@ -13,6 +13,9 @@ const defaultPrefs={
     // playback/webaudio-synth
     "webAudioSynthVolume":"50",
     
+    // playback/webaudio-samples
+    "webAudioSamplesVolume":"50",
+    
     // playback/midi
     
     // listener/WikimediaListener

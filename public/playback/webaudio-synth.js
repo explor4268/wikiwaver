@@ -20,11 +20,12 @@ class WebAudioSynthPlayback{
         this.instr3type="square";
         this.noteDurationS=2;
         
+        webAudioSynthOptionsContainer.open=true;
         this.noteToFreqTable=[];
         for(let i=0;i<127;i++){
             this.noteToFreqTable.push(440*Math.pow(2,(i-69)/12));
         }
-        log("info","Web Audio API Synth Playback initialized");
+        log("info","Web Audio API (Synth) Playback initialized");
     }
     playNote(note,type=1,noteDurationS=null){
         if(type===4)return;
@@ -69,7 +70,7 @@ class WebAudioSynthPlayback{
         };
     }
     stop(){
-        log("info","Closing Web Audio API Synth Playback");
+        log("info","Closing Web Audio API (Synth) Playback");
         return this.actx.close();
     }
 }

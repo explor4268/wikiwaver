@@ -31,7 +31,6 @@ This project was originally started as a clone of <https://github.com/hatnote/li
 
 ## TODO
 
-- [ ] Sampled Instruments for Audio
 - [ ] More options
   - [ ] url params
     - [ ] disable seedrandom

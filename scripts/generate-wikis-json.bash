@@ -1,6 +1,22 @@
 #!/bin/bash
 set -euo pipefail
 
+# dependency check
+if ! command -v curl >/dev/null 2>&1; then
+    echo 'curl not found in PATH. Please install it on your system. Exiting...'
+    exit 1
+fi
+
+if ! command -v grep >/dev/null 2>&1; then
+    echo 'grep not found in PATH. Please install it on your system. Exiting...'
+    exit 1
+fi
+
+if ! command -v sed >/dev/null 2>&1; then
+    echo 'sed not found in PATH. Please install it on your system. Exiting...'
+    exit 1
+fi
+
 outdir="public/listener"
 
 if [[ ! -d "$outdir" ]]; then

@@ -55,13 +55,29 @@
             <legend>Playback mode</legend>
             <div>
                 <input type="checkbox" id="playbackmode-webaudiosynth" autocomplete="off">
-                <label for="playbackmode-webaudiosynth">Web Audio API Synth</label>
-                <details open>
-                    <summary>Web Audio API Synth Settings</summary>
+                <label for="playbackmode-webaudiosynth">Web Audio API (Synth)</label>
+                <details id="webaudiosynth-options-container">
+                    <summary>Web Audio API (Synth) Settings</summary>
                     <div class="rangeinput">
                         <label for="webaudiosynth-volume">Volume:</label>
                         <input type="range" id="webaudiosynth-volume" min="0" max="100" step="1" value="50" autocomplete="off">
                         <label for="webaudiosynth-volume"><span id="webaudiosynth-volume-label">50</span>%</label>
+                    </div>
+                </details>
+            </div>
+            <div>
+                <input type="checkbox" id="playbackmode-webaudiosamples" autocomplete="off">
+                <label for="playbackmode-webaudiosamples">Web Audio API (Samples)</label>
+                <details id="webaudiosamples-options-container">
+                    <summary>Web Audio API (Samples) Settings</summary>
+                    <div id="webaudiosamples-loading-progress-bar-container">
+                        <div>Loading samples</div>
+                        <progress id="webaudiosamples-loading-progress-bar"></progress><span id="webaudiosamples-loading-progress-bar-tooltip">0</span>%
+                    </div>
+                    <div class="rangeinput">
+                        <label for="webaudiosamples-volume">Volume:</label>
+                        <input type="range" id="webaudiosamples-volume" min="0" max="100" step="1" value="50" autocomplete="off">
+                        <label for="webaudiosamples-volume"><span id="webaudiosamples-volume-label">50</span>%</label>
                     </div>
                 </details>
             </div>
@@ -119,6 +135,7 @@
     <script src="logger.js"></script>
     <script src="listener/WikimediaListener.js"></script>
     <script src="playback/webaudio-synth.js"></script>
+    <script src="playback/webaudio-samples.js"></script>
     <script src="playback/midi.js"></script>
     <script src="playback/visualizer.js"></script>
     <script src="main.js"></script>

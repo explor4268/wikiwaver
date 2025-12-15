@@ -12,23 +12,40 @@ let baseNote=48;
 const mobileWarningDialog=document.getElementById("mobile-warning");
 const mobileWarningBgPlaybackMobileSafariNotice=document.getElementById("bgplayback-mobilesafari-notice");
 const mobileWarningHideForeverCheckbox=document.getElementById("mobile-warning-hide-forever");
+
 const startStopButton=document.getElementById("start-stop-button");
+
 const themeSelectorContainer=document.getElementById("theme-selector-container");
+
 const playbackModeWebAudioSynthCheckbox=document.getElementById("playbackmode-webaudiosynth");
+const webAudioSynthOptionsContainer=document.getElementById("webaudiosynth-options-container");
 const webAudioSynthVolumeInput=document.getElementById("webaudiosynth-volume");
 const webAudioSynthVolumeText=document.getElementById("webaudiosynth-volume-label");
+
+const playbackModeWebAudioSamplesCheckbox=document.getElementById("playbackmode-webaudiosamples");
+const webAudioSamplesOptionsContainer=document.getElementById("webaudiosamples-options-container");
+const webAudioSamplesLoadingProgressBarContainer=document.getElementById("webaudiosamples-loading-progress-bar-container");
+const webAudioSamplesLoadingProgressBar=document.getElementById("webaudiosamples-loading-progress-bar");
+const webAudioSamplesLoadingProgressBarTooltip=document.getElementById("webaudiosamples-loading-progress-bar-tooltip");
+const webAudioSamplesVolumeInput=document.getElementById("webaudiosamples-volume");
+const webAudioSamplesVolumeText=document.getElementById("webaudiosamples-volume-label");
+
 const playbackModeMidiCheckbox=document.getElementById("playbackmode-midi");
 const midiDeviceSelector=document.getElementById("midi-device-selector");
 const midiDeviceSelectorContainer=document.getElementById("midi-device-selector-container");
+
 const wikisSelectorShowCommentsCheckbox=document.getElementById("wikis-selector-showcomments");
 const wikisSelectorDetails=document.getElementById("wikis-selector-details");
 const wikisSelectorContainer=document.getElementById("wikis-selector-container");
 const wikisSelectorFilterInput=document.getElementById("wikis-selector-filter");
 const wikisSelectorSelectAllCheckbox=document.getElementById("wikis-selector-selectall");
+
 const loggerItemPlacementOptionContainer=document.getElementById("logger-item-placement-option-container");
+
 const visualizerFullscreenButtom=document.getElementById("visualizer-fullscreen-button");
 const visualizerDetails=document.getElementById("visualizer-details");
 const visualizerContainer=document.getElementById("visualizer-container");
+
 const totalEntriesText=document.getElementById("total-entries");
 // biome-ignore-end lint/correctness/noUnusedVariables: cross-file reference, intentional
 
@@ -86,10 +103,10 @@ window.addEventListener("online",()=>{
     log("info","You're back online")
 });
 
-const players=[null,null,null];
+const players=[null,null,null,null];
 
 // Derived from https://github.com/hatnote/listen-to-wikipedia/blob/ea708fdb4e8e0d1dc1bc593dd29cdd4bdaa21503/static/js/app.js#L248
-const scaleFactor=5,maxPitch=100,logUsed=1.0715307808111487;
+const scaleFactor=5,maxPitch=100,logUsed=1.0715307808111487,claviOffset=-24;
 let totalEntries=0;
 function playSound(soundType,data,diffLength){
     let index;
@@ -105,7 +122,7 @@ function playSound(soundType,data,diffLength){
             const y=Math.random(); // y = Math.random() * (height - size) + size;
             fuzz=Math.floor(Math.random()*4)-2;
             index=Math.max(1,Math.min(Math.floor(pitch/100*notes.length)+fuzz,notes.length-1));
-            const note=notes[index]-(diffLength<0?24:0);
+            const note=notes[index]+(type===2?claviOffset:0);
             for(const player of players){
                 if(!player)continue;
                 if(player.constructor.name==="VisualizerPlayback"){
@@ -139,8 +156,9 @@ playbackModeWebAudioSynthCheckbox.onchange=()=>{
         playbackModeWebAudioSynthCheckbox.disabled=true;
         players[0].stop().then(()=>{
             playbackModeWebAudioSynthCheckbox.disabled=false;
+            webAudioSynthOptionsContainer.open=false;
             players[0]=null;
-            log("info","Web Audio API Synth Playback disabled");
+            log("info","Web Audio API (Synth) Playback disabled");
         }).catch(e=>log("error",e));
     }
 }
@@ -160,15 +178,58 @@ const savedWebAudioSynthVolume=getPreference("webAudioSynthVolume");
 webAudioSynthVolumeInput.value=savedWebAudioSynthVolume;
 updateWebAudioSynthVolume();
 
+// web audio api samples options
+playbackModeWebAudioSamplesCheckbox.onchange=evt=>{
+    if(playbackModeWebAudioSamplesCheckbox.checked&&players[3]===null){
+        webAudioSamplesOptionsContainer.open=true;
+        players[3]=new WebAudioSamplesPlayback();
+    }else if((!playbackModeWebAudioSamplesCheckbox.checked)&&players[3]){
+        if(!players[3].loaded){
+            evt.preventDefault();
+            return;
+        }
+        playbackModeWebAudioSamplesCheckbox.disabled=true;
+        players[3].stop().then(()=>{
+            playbackModeWebAudioSamplesCheckbox.disabled=false;
+            webAudioSamplesOptionsContainer.open=false;
+            webAudioSamplesLoadingProgressBar.value=0;
+            webAudioSamplesLoadingProgressBarTooltip.textContent=0;
+            webAudioSamplesLoadingProgressBarContainer.classList.remove("hidden");
+            players[3]=null;
+            log("info","Web Audio API (Samples) Playback disabled");
+        }).catch(e=>log("error",e));
+    }
+}
+
+function updateWebAudioSamplesVolume(e){
+    const currentVolume=webAudioSamplesVolumeInput.value;
+    if(players[3]){
+        players[3].mainGainNode.gain.value=parseInt(currentVolume,10)/100;
+    }
+    webAudioSamplesVolumeText.textContent=currentVolume;
+    if(e)setPreference("webAudioSamplesVolume",currentVolume);
+}
+
+webAudioSamplesVolumeInput.oninput=updateWebAudioSamplesVolume;
+
+const savedWebAudioSamplesVolume=getPreference("webAudioSamplesVolume");
+webAudioSamplesVolumeInput.value=savedWebAudioSamplesVolume;
+updateWebAudioSamplesVolume();
+
 // for mobile devices
 addEventListener("touchend",()=>{
     if(players[0]&&players[0].actx.state!=="running")players[0].actx.resume();
+    if(players[3]&&players[3].actx.state!=="running")players[3].actx.resume();
 });
 
 // midi playback option
-playbackModeMidiCheckbox.onchange=()=>{
+playbackModeMidiCheckbox.onchange=evt=>{
     if(playbackModeMidiCheckbox.checked&&players[1]===null)players[1]=new MidiPlayback();
     else if((!playbackModeMidiCheckbox.checked)&&players[1]){
+        if(!players[1].midiInitialized){
+            evt.preventDefault();
+            return;
+        }
         playbackModeMidiCheckbox.disabled=true;
         players[1].stop().then(()=>{
             playbackModeMidiCheckbox.disabled=false;
