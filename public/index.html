@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Listen to Wikipedia's Recent Changes feed with Web MIDI API support using the official EventStreams HTTP Service provided by Wikimedia Foundation.">
     <title>wikiwaver</title>
     <link rel="stylesheet" href="style.css">
     <script>
         // biome-ignore lint/correctness/noUnusedVariables: cross-file reference, intentional
         var scriptSuccessfullyLoaded=false;
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js" integrity="sha512-+Ru50BzEpZjlFzVnjSmJfYFPFfY2hS0Kjlu/IvqaJoux7maF5lJrRVUJWJ2LevPls7rd242GLbWEt+zAo4OVVQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body onload="if(!scriptSuccessfullyLoaded){document.getElementById('script-error').className=''}">
     <h1>wikiwaver</h1>
@@ -24,7 +24,7 @@
         </p>
     </div>
     <dialog id="mobile-warning">
-        <h1>Notice for Mobile Users</h1>
+        <h1>Notice for Mobile/Metered/Slow Internet Users</h1>
         <p>Beware that because of the EventStreams approach and the <a href="https://wikitech.wikimedia.org/wiki/Event_Platform/EventStreams_HTTP_Service#Filtering" target="_blank">lack of event filtering</a>, this web app uses a significant amount of network bandwidth (about 60-100 KiB/s or about 500-800 kbit/s).</p>
         <p>Running this web app in the foreground or background for an hour could consume roughly <b>up to 350 megabytes of data, or even more.</b> So, ensure that you have a sufficient internet connection before running this web app in the background.</p>
         <p id="bgplayback-mobilesafari-notice" class="hidden"><b>Also, please be aware that background audio playback is not supported on iOS browsers (including Safari, Chrome, and Firefox on iOS) at the moment. If you accidentally did this by mistake, you can tap anywhere in this page to resume audio playback.</b></p>
@@ -59,7 +59,8 @@
                 <details id="webaudiosynth-options-container">
                     <summary>Web Audio API (Synth) Settings</summary>
                     <div class="rangeinput">
-                        <label for="webaudiosynth-volume">Volume:</label>
+                        <label for="webaudiosynth-volume">Volume: </label>
+                        <button id="webaudiosynth-volume-mute-btn" data-muted="no">Mute</button>
                         <input type="range" id="webaudiosynth-volume" min="0" max="100" step="1" value="50" autocomplete="off">
                         <label for="webaudiosynth-volume"><span id="webaudiosynth-volume-label">50</span>%</label>
                     </div>
@@ -70,12 +71,13 @@
                 <label for="playbackmode-webaudiosamples">Web Audio API (Samples)</label>
                 <details id="webaudiosamples-options-container">
                     <summary>Web Audio API (Samples) Settings</summary>
-                    <div id="webaudiosamples-loading-progress-bar-container">
+                    <div id="webaudiosamples-loading-progress-bar-container" class="hidden">
                         <div>Loading samples</div>
                         <progress id="webaudiosamples-loading-progress-bar"></progress><span id="webaudiosamples-loading-progress-bar-tooltip">0</span>%
                     </div>
                     <div class="rangeinput">
-                        <label for="webaudiosamples-volume">Volume:</label>
+                        <label for="webaudiosamples-volume">Volume: </label>
+                        <button id="webaudiosamples-volume-mute-btn" data-muted="no">Mute</button>
                         <input type="range" id="webaudiosamples-volume" min="0" max="100" step="1" value="50" autocomplete="off">
                         <label for="webaudiosamples-volume"><span id="webaudiosamples-volume-label">50</span>%</label>
                     </div>

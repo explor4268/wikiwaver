@@ -35,7 +35,7 @@ def main():
     mid.tracks.append(trk)
 
     tempo=mido.bpm2tempo(args.bpm)
-    
+
     def seconds_to_ticks(s):
         return int(round(s*mid.ticks_per_beat*1_000_000/tempo))
 

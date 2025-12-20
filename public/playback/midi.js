@@ -50,6 +50,7 @@ class MidiPlayback{
                 }
             }catch(e){
                 log("error",`Error when loading WEBMIDI.js library: ${e}`);
+                this.errorOccurred=true;
                 playbackModeMidiCheckbox.indeterminate=true;
                 playbackModeMidiCheckbox.disabled=false;
                 throw e;
@@ -86,6 +87,7 @@ class MidiPlayback{
             }
         }catch(e){
             log("error",`Error when enabling MIDI: ${e}`);
+            this.errorOccurred=true;
             playbackModeMidiCheckbox.indeterminate=true;
             playbackModeMidiCheckbox.disabled=false;
             throw e;
@@ -115,6 +117,7 @@ class MidiPlayback{
     }
     stop(){
         log("info","Closing MIDI Playback");
+        if(this.errorOccurred)return new Promise(resolve=>resolve());
         this.stopOngoingPlayback();
         return WebMidi.disable();
     }
@@ -134,6 +137,7 @@ class MidiPlayback{
             this.notePlaybacks.push(new Array(128).fill(null));
         }
         this.midiInitialized=false;
+        this.errorOccurred=false;
         this.selectedMidiDevice=null;
         this.selectedMidiOutput=null;
         playbackModeMidiCheckbox.disabled=true;

@@ -34,7 +34,15 @@ class WebAudioSamplesPlayback{
         webAudioSamplesLoadingProgressBar.max=this.totalElementsToLoad;
         webAudioSamplesLoadingProgressBar.value=0;
         
-        await Promise.all(promises);
+        try{
+            await Promise.all(promises);
+        }catch(e){
+            log("error",`Error when loading audio samples: ${e}`);
+            playbackModeWebAudioSamplesCheckbox.indeterminate=true;
+            playbackModeWebAudioSamplesCheckbox.disabled=false;
+            this.errorOccurred=true;
+            throw e;
+        }
         promises=null;
         
         this.loaded=true;
@@ -43,10 +51,12 @@ class WebAudioSamplesPlayback{
     }
     playNote(note,type=1,_ignored){
         if(type===4)return;
+        if(!this.loaded)return;
         if(this.actx.state!=="running")return;
         if(Array.isArray(note)){
             note=note.join(",");
         }
+        if(type<1||type>this.instr.length)return;
         const buffer=this.instr[type-1].get(note);
         if(!buffer)return;
         const sampleSource=new AudioBufferSourceNode(this.actx,{buffer:buffer});
@@ -69,6 +79,7 @@ class WebAudioSamplesPlayback{
         this.mainGainNode.gain.value=parseInt(getPreference("webAudioSamplesVolume"),10)/100;
         this.instr=[new Map(),new Map(),new Map()];
         this.loaded=false;
+        this.errorOccurred=false;
         this.totalElementsToLoad=0;
         this.loadedElements=0;
         this.initialize();

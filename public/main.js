@@ -2,10 +2,8 @@
 // biome-ignore-all lint/complexity/useOptionalChain: compatibility
 "use strict"
 
-// prefs
-// biome-ignore-start lint/style/useConst: future: editable prefs
-let baseNote=48;
-// biome-ignore-end lint/style/useConst: future: editable prefs
+// constants
+const baseNote=48;
 
 // ui elements
 // biome-ignore-start lint/correctness/noUnusedVariables: cross-file reference, intentional
@@ -19,6 +17,7 @@ const themeSelectorContainer=document.getElementById("theme-selector-container")
 
 const playbackModeWebAudioSynthCheckbox=document.getElementById("playbackmode-webaudiosynth");
 const webAudioSynthOptionsContainer=document.getElementById("webaudiosynth-options-container");
+const webAudioSynthVolumeMuteButton=document.getElementById("webaudiosynth-volume-mute-btn");
 const webAudioSynthVolumeInput=document.getElementById("webaudiosynth-volume");
 const webAudioSynthVolumeText=document.getElementById("webaudiosynth-volume-label");
 
@@ -27,6 +26,7 @@ const webAudioSamplesOptionsContainer=document.getElementById("webaudiosamples-o
 const webAudioSamplesLoadingProgressBarContainer=document.getElementById("webaudiosamples-loading-progress-bar-container");
 const webAudioSamplesLoadingProgressBar=document.getElementById("webaudiosamples-loading-progress-bar");
 const webAudioSamplesLoadingProgressBarTooltip=document.getElementById("webaudiosamples-loading-progress-bar-tooltip");
+const webAudioSamplesVolumeMuteButton=document.getElementById("webaudiosamples-volume-mute-btn");
 const webAudioSamplesVolumeInput=document.getElementById("webaudiosamples-volume");
 const webAudioSamplesVolumeText=document.getElementById("webaudiosamples-volume-label");
 
@@ -50,7 +50,6 @@ const totalEntriesText=document.getElementById("total-entries");
 // biome-ignore-end lint/correctness/noUnusedVariables: cross-file reference, intentional
 
 // general functions
-// biome-ignore lint/correctness/noUnusedVariables: cross-file reference, intentional
 function loadScript(src,sri,crossorigin,referrerpolicy="no-referrer",type){
     if(typeof src!=="string")throw new Error("loadScript: src parameter is invalid or not defined");
     if(sri&&typeof sri!=="string")throw new Error("loadScript: invalid sri parameter");
@@ -174,6 +173,24 @@ function updateWebAudioSynthVolume(e){
 
 webAudioSynthVolumeInput.oninput=updateWebAudioSynthVolume;
 
+webAudioSynthVolumeMuteButton.onclick=()=>{
+    if(!players[0])return;
+    if(webAudioSynthVolumeMuteButton.dataset.muted==="no"){
+        webAudioSynthVolumeMuteButton.dataset.previousVolume=webAudioSynthVolumeInput.value;
+        webAudioSynthVolumeInput.value="0";
+        webAudioSynthVolumeInput.disabled=true;
+        updateWebAudioSynthVolume(true);
+        webAudioSynthVolumeMuteButton.textContent="Unmute";
+        webAudioSynthVolumeMuteButton.dataset.muted="yes";
+    }else{
+        webAudioSynthVolumeInput.value=webAudioSynthVolumeMuteButton.dataset.previousVolume;
+        webAudioSynthVolumeInput.disabled=false;
+        updateWebAudioSynthVolume(true);
+        webAudioSynthVolumeMuteButton.textContent="Mute";
+        webAudioSynthVolumeMuteButton.dataset.muted="no";
+    }
+}
+
 const savedWebAudioSynthVolume=getPreference("webAudioSynthVolume");
 webAudioSynthVolumeInput.value=savedWebAudioSynthVolume;
 updateWebAudioSynthVolume();
@@ -182,9 +199,10 @@ updateWebAudioSynthVolume();
 playbackModeWebAudioSamplesCheckbox.onchange=evt=>{
     if(playbackModeWebAudioSamplesCheckbox.checked&&players[3]===null){
         webAudioSamplesOptionsContainer.open=true;
+        webAudioSamplesLoadingProgressBarContainer.classList.remove("hidden");
         players[3]=new WebAudioSamplesPlayback();
     }else if((!playbackModeWebAudioSamplesCheckbox.checked)&&players[3]){
-        if(!players[3].loaded){
+        if((!players[3].errorOccurred)&&(!players[3].loaded)){
             evt.preventDefault();
             return;
         }
@@ -212,6 +230,24 @@ function updateWebAudioSamplesVolume(e){
 
 webAudioSamplesVolumeInput.oninput=updateWebAudioSamplesVolume;
 
+webAudioSamplesVolumeMuteButton.onclick=()=>{
+    if(!players[3])return;
+    if(webAudioSamplesVolumeMuteButton.dataset.muted==="no"){
+        webAudioSamplesVolumeMuteButton.dataset.previousVolume=webAudioSamplesVolumeInput.value;
+        webAudioSamplesVolumeInput.value="0";
+        webAudioSamplesVolumeInput.disabled=true;
+        updateWebAudioSamplesVolume(true);
+        webAudioSamplesVolumeMuteButton.textContent="Unmute";
+        webAudioSamplesVolumeMuteButton.dataset.muted="yes";
+    }else{
+        webAudioSamplesVolumeInput.value=webAudioSamplesVolumeMuteButton.dataset.previousVolume;
+        webAudioSamplesVolumeInput.disabled=false;
+        updateWebAudioSamplesVolume(true);
+        webAudioSamplesVolumeMuteButton.textContent="Mute";
+        webAudioSamplesVolumeMuteButton.dataset.muted="no";
+    }
+}
+
 const savedWebAudioSamplesVolume=getPreference("webAudioSamplesVolume");
 webAudioSamplesVolumeInput.value=savedWebAudioSamplesVolume;
 updateWebAudioSamplesVolume();
@@ -226,7 +262,7 @@ addEventListener("touchend",()=>{
 playbackModeMidiCheckbox.onchange=evt=>{
     if(playbackModeMidiCheckbox.checked&&players[1]===null)players[1]=new MidiPlayback();
     else if((!playbackModeMidiCheckbox.checked)&&players[1]){
-        if(!players[1].midiInitialized){
+        if((!players[1].errorOccurred)&&(!players[1].midiInitialized)){
             evt.preventDefault();
             return;
         }
@@ -306,38 +342,44 @@ wikisSelectorShowCommentsCheckbox.checked=getPreference("wikimediaListenerShowCo
 // wikis selector
 let isWikisListLoading=false;
 async function onWikisSelectorDetailsToggled(){
-    if(isWikisListLoading)return;
-    if(!wikisSelectorDetails.open)return;
-    if(document.getElementById("wikis-selector-is-loading")===null)return;
-    isWikisListLoading=true;
-    const wikisResponse=await fetch("listener/wikis.json");
-    const wikis=await wikisResponse.json();
-    isWikisListLoading=false;
-    wikis.sort((a,b)=>a.n>b.n);
-    wikisSelectorContainer.innerHTML="";
-    let tmpDiv,tmpEl,wikiName;
-    for(const wiki of wikis){
-        wikiName=`${wiki.n} (${wiki.w})`;
-        
-        tmpDiv=document.createElement("div");
-        tmpDiv.classList.add("wikis-selector-div");
-        tmpDiv.dataset.wikiName=wikiName;
-        
-        tmpEl=document.createElement("input");
-        tmpEl.autocomplete="off";
-        tmpEl.type="checkbox";
-        tmpEl.id=wiki.w;
-        tmpEl.classList.add("wikis-selector");
-        tmpEl.checked=wikimediaListener.acceptedWikis.indexOf(wiki.w)!==-1;
-        tmpEl.dataset.wikiName=wikiName;
-        tmpDiv.appendChild(tmpEl);
-        
-        tmpEl=document.createElement("label");
-        tmpEl.htmlFor=wiki.w;
-        tmpEl.textContent=wikiName;
-        tmpDiv.appendChild(tmpEl);
-        
-        wikisSelectorContainer.appendChild(tmpDiv);
+    try{
+        if(isWikisListLoading)return;
+        if(!wikisSelectorDetails.open)return;
+        if(document.getElementById("wikis-selector-is-loading")===null)return;
+        isWikisListLoading=true;
+        const wikisResponse=await fetch("listener/wikis.json");
+        const wikis=await wikisResponse.json();
+        isWikisListLoading=false;
+        wikis.sort((a,b)=>a.n>b.n);
+        wikisSelectorContainer.innerHTML="";
+        let tmpDiv,tmpEl,wikiName;
+        for(const wiki of wikis){
+            wikiName=`${wiki.n} (${wiki.w})`;
+            
+            tmpDiv=document.createElement("div");
+            tmpDiv.classList.add("wikis-selector-div");
+            tmpDiv.dataset.wikiName=wikiName;
+            
+            tmpEl=document.createElement("input");
+            tmpEl.autocomplete="off";
+            tmpEl.type="checkbox";
+            tmpEl.id=wiki.w;
+            tmpEl.classList.add("wikis-selector");
+            tmpEl.checked=wikimediaListener.acceptedWikis.indexOf(wiki.w)!==-1;
+            tmpEl.dataset.wikiName=wikiName;
+            tmpDiv.appendChild(tmpEl);
+            
+            tmpEl=document.createElement("label");
+            tmpEl.htmlFor=wiki.w;
+            tmpEl.textContent=wikiName;
+            tmpDiv.appendChild(tmpEl);
+            
+            wikisSelectorContainer.appendChild(tmpDiv);
+        }
+    }catch(e){
+        log("error",`Error when loading the list of wikis: ${e}`);
+        isWikisListLoading=false;
+        throw e;
     }
 }
 
@@ -435,17 +477,34 @@ visualizerContainer.onfullscreenchange=()=>{
     visualizerFullscreenButtom.textContent=document.fullscreenElement?"Exit fullscreen":"Fullscreen";
 }
 
-// mobile user warning
-if(navigator.maxTouchPoints&&(!getPreference("hideMobileWarning"))){
+// mobile user/metered network warning
+if((enableNetworkWarnings)&&(!getPreference("hideMobileWarning"))){
     mobileWarningDialog.addEventListener("close",()=>{
         if(mobileWarningHideForeverCheckbox.checked)setPreference("hideMobileWarning",true)
-        wikimediaListener.initializeStream();
+        if(autoListen)wikimediaListener.initializeStream();
+        else{
+            startStopButton.textContent="Connect";
+            startStopButton.disabled=false;
+        }
     });
-    if(/iOS|Macintosh|iP(hone|ad|od)/.test(navigator.userAgent)){
+    if(navigator.maxTouchPoints&&/iOS|Macintosh|iP(hone|ad|od)/.test(navigator.userAgent)){
         mobileWarningBgPlaybackMobileSafariNotice.classList.remove("hidden");
     }
     mobileWarningDialog.showModal();
-}else wikimediaListener.initializeStream();
+}else if(autoListen)wikimediaListener.initializeStream();
+else{
+    startStopButton.textContent="Connect";
+    startStopButton.disabled=false;
+}
+
+// load seedrandom
+if(useSeedRandom){
+    loadScript("https://cdnjs.cloudflare.com/ajax/libs/seedrandom/3.0.5/seedrandom.min.js","sha512-+Ru50BzEpZjlFzVnjSmJfYFPFfY2hS0Kjlu/IvqaJoux7maF5lJrRVUJWJ2LevPls7rd242GLbWEt+zAo4OVVQ==","anonymous","no-referrer").then(()=>{
+        log("info","Loaded seedrandom library");
+    }).catch(e=>{
+        log("error",`Failed to load seedrandom library: ${e}`);
+    });
+}
 
 // mark script as loaded successfully
 scriptSuccessfullyLoaded=true;

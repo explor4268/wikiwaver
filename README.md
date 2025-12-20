@@ -18,7 +18,7 @@ This project was originally started as a clone of <https://github.com/hatnote/li
 **Audio:**
 
 - Web Audio (Synth)
-- MIDI
+- MIDI with WEBMIDI.js library (loaded from `cdn.jsdelivr.net`)
 
 **Wikipedia Recent Changes:**
 
@@ -29,13 +29,47 @@ This project was originally started as a clone of <https://github.com/hatnote/li
 - Notify on page moves
 - Notify on new users
 
-## TODO
+## Preferences
 
-- [ ] More options
-  - [ ] url params
-    - [ ] disable seedrandom
-    - [ ] disable localstorage
-    - [ ] disable autolisten
+Most options in the UI will be saved into your browser's per-site local storage.
+
+### URL search parameter-only preferences
+
+The following preferences can only be set using the page URL search parameters. For example, adding `?autoListen=0` into the end of the page URL will set `autoListen` to `0`, and using `?enableNetworkWarnings=0&useSeedrandom=0` will set `enableNetworkWarnings` to `0` and `useSeedrandom` to `0`
+
+#### `enableNetworkWarnings`
+
+Enables the initial warning message at page load. Default is enabled (equivalent to setting the value as anything other than `0`).
+
+Setting this parameter into `0` will suppress the warning prompt, but setting it into any other values including `1` will not re-enable the prompt if the "Don't show this message again" option is selected.
+
+#### `useSeedrandom`
+
+Enables the usage of the `seedrandom` library. Default is enabled (equivalent to setting the value as anything other than `0`).
+
+Setting this parameter into `0` will disable both the loading and usage of the `seedrandom` library. Library is loaded from `cdnjs.cloudflare.com` if enabled.
+
+#### `clearPrefs`
+
+Clears any saved preferences in your browser's local storage. Default is disabled (equivalent to setting the value as anything other than `1`).
+
+This only affects keys prefixed with `wikiwaver:` on the same host as the page, meaning that other preferences for my other projects will not be cleared.
+
+Setting this parameter into `1` will clear saved preferences on every page load as long as this parameter is set to `1`.
+
+#### `useLocalStorage`
+
+Enables the usage of the browser's local storage API. Default is enabled (equivalent to setting the value as anything other than `0`).
+
+Setting this parameter into `0` will prevent any preferences to load from or save into your browser's local storage, without clearing your saved preferences.
+
+#### `autoListen`
+
+Enables the automatic connection and listening into Wikimedia's EventStreams Service. Default is enabled (equivalent to setting the value as anything other than `0`).
+
+Automatic audio playback is not possible because of autoplay limitation in most browsers.
+
+Setting this parameter into `0` will disable the automatic connection to Wikimedia's EventStreams Service.
 
 ## Credits
 

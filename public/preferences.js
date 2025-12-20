@@ -26,7 +26,7 @@ const defaultPrefs={
 // structuredClone is not available on older browsers
 const prefs=JSON.parse(JSON.stringify(defaultPrefs));
 
-const hasLocalStorage=!!localStorage;
+let hasLocalStorage=!!localStorage;
 if(!hasLocalStorage)log("error","localStorage is not available in your browser. Preferences cannot be saved.");
 
 function getLocalStorageKeyName(key){
@@ -49,7 +49,6 @@ function setPreference(key,value){
     if(hasLocalStorage)localStorage.setItem(getLocalStorageKeyName(key),JSON.stringify(value));
 }
 
-// biome-ignore lint/correctness/noUnusedVariables: cross-file reference, intentional
 function clearSavedPreferences(){
     if(!hasLocalStorage)return;
     const localStorageKeys=Object.keys(localStorage);
@@ -59,3 +58,17 @@ function clearSavedPreferences(){
         localStorage.removeItem(currentKey);
     }
 }
+
+
+
+// urlsearchparams-only preferences
+const searchParams=new URLSearchParams(location.search);
+// biome-ignore-start lint/correctness/noUnusedVariables: cross-file reference, intentional
+const enableNetworkWarnings=searchParams.get("enableNetworkWarnings")!=="0";
+const useSeedRandom=searchParams.get("useSeedrandom")!=="0";
+if(hasLocalStorage){
+    if(searchParams.get("clearPrefs")==="1")clearSavedPreferences();
+    if(searchParams.get("useLocalStorage")==="0")hasLocalStorage=false;
+}
+const autoListen=searchParams.get("autoListen")!=="0";
+// biome-ignore-end lint/correctness/noUnusedVariables: cross-file reference, intentional
