@@ -18,6 +18,7 @@ This project was originally started as a clone of <https://github.com/hatnote/li
 **Audio:**
 
 - Web Audio (Synth)
+- Web Audio (Samples)
 - MIDI with WEBMIDI.js library (loaded from `cdn.jsdelivr.net`)
 
 **Wikipedia Recent Changes:**
