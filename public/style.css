@@ -66,6 +66,10 @@ html,body{
     color: var(--main-color);
 }
 
+#mobile-warning{
+    max-width: 800px;
+}
+
 #logs{
     display: flex;
     flex-direction: column;
