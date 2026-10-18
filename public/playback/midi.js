@@ -43,7 +43,7 @@ class MidiPlayback{
         if(!globalThis.WebMidi){
             log("info","Loading WEBMIDI.js library...");
             try{
-                await loadScript("https://cdn.jsdelivr.net/npm/webmidi@3.1.14/dist/iife/webmidi.iife.min.js","sha256-O7EEMiS+a/K81hl1HyIhl2jXsimqTPH5OvsHz5ujg9Y=","anonymous","no-referrer");
+                await loadScript("https://cdn.jsdelivr.net/npm/webmidi@3.3.1/dist/iife/webmidi.iife.min.js","sha384-8sXAtKkDQoz30+Z9e6ig7/uyJTNQUNcfkAJcjQUk05FOO9YeLkQACC/Ccp/YmkzW","anonymous","no-referrer");
                 if(!globalThis.WebMidi){
                     log("error","WebMidi is not defined");
                     throw new Error("WebMidi is not defined");
